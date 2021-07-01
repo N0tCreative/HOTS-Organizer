@@ -12,6 +12,13 @@ class hero {
 };
 
 int main() {
-    std::cout << "hello";
+    std::ifstream heroList;
+    heroList.open("heroList.txt");
+    if(!heroList.is_open()) {
+        std::cout << "heroList.txt failed to open please check your file";
+        return -1;
+    }
+    std::cout << "opened file correctly";
+    heroList.close();
     return 0;
 }
