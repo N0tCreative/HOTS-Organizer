@@ -2,24 +2,21 @@
 #include <fstream>
 #include <string>
 #include <unordered_map>
-#include <vector>
 
 using namespace std;
 
-enum role {Tank=0, Bruiser, Ranged_Assassin, Melee_Assassin, Healer, Support}; //class of hero
-enum universe {Warcraft=0, StarCraft, Diablo, Overwatch, Nexus}; //heros original game
+enum role : unsigned char {Tank=0, Bruiser, Ranged_Assassin, Melee_Assassin, Healer, Support}; //class of hero
+enum universe : unsigned char {Warcraft=0, StarCraft, Diablo, Overwatch, Nexus}; //heros original game
 
 //contains attributes of the heros
-class hero {
-    private:
+struct hero {
+    public:
         string heroName;
         role heroRole;
         universe heroUni;
         bool mage; //main source of dps comes from abilities
         bool burst; //damage comes in short bursts
         bool sustain; //ability to remain in combat for long periods of time (combination of mana efficiency and self heal)
-
-    public:
     //constructor for heros that are not initialized
     hero() {
         heroName = "";
@@ -38,58 +35,9 @@ class hero {
         burst = newBurst;
         sustain = newSustain;
     }
-
-    void setName(string newName) {
-        heroName = newName;
-    }
-
-    string getName() {
-        return heroName;
-    }
-
-    void setRole(role newRole) {
-        heroRole = newRole;
-    }
-
-    role getRole() {
-        return heroRole;
-    }
-
-    void setUniverse(universe newUniverse) {
-        heroUni = newUniverse;
-    }
-
-    universe getUniverse() {
-        return heroUni;
-    }
-
-    void setMage(bool newMage) {
-        mage = newMage;
-    }
-
-    bool isMage() {
-        return mage;
-    }
-
-    void setBurst(bool newBurst) {
-        burst = newBurst;
-    }
-
-    bool isBurst() {
-        return burst;
-    }
-
-    void setSustain(bool newSustain) {
-        sustain = newSustain;
-    }
-
-    bool isSustain() {
-        return sustain;
-    }
-
 };
 
-//for converting bools to human readable text TODO: remove after testing is done
+//for converting bools to human readable text (taken from stack overflow) TODO: remove after testing is done
 inline string boolToString(bool b)
 {
   return b ? "true" : "false";
@@ -110,7 +58,7 @@ int main() {
                                                     {"sc", universe::StarCraft}, 
                                                     {"di", universe::Diablo}, 
                                                     {"ow", universe::Overwatch},
-                                                    {"ne", universe::Nexus},
+                                                    {"ne", universe::Nexus}
                                                     };
     string temp;
     string roles[] = {"Tank", "Bruiser", "Ranged_Assassin", "Melee_Assassin", "Healer", "Support"}; //used to convert enum back into string
@@ -128,37 +76,37 @@ int main() {
     //start of getting data from text file
     //getting heros name
     getline(heroList, temp);
-    tmp_hero.setName(temp);
+    tmp_hero.heroName =temp;
     //getting heros role then trimming it and converting to enum
     getline(heroList, temp);
     temp.erase(temp.begin(), temp.begin() + temp.find_first_not_of(" \n\r\t"));
-    tmp_hero.setRole(roleConverter.find(temp)->second);
+    tmp_hero.heroRole = roleConverter.find(temp)->second;
     //getting heros universe then trimming it and converting to enum
     getline(heroList, temp);
     temp.erase(temp.begin(), temp.begin() + temp.find_first_not_of(" \n\r\t"));
-    tmp_hero.setUniverse(uniConverter.find(temp)->second);
+    tmp_hero.heroUni = uniConverter.find(temp)->second;
     //getting if hero is a mage
     getline(heroList, temp);
     temp.erase(temp.begin(), temp.begin() + temp.find_first_not_of(" \n\r\t"));
-    tmp_hero.setMage("true" == temp || "True" == temp);
+    tmp_hero.mage =("true" == temp || "True" == temp);
     //getting if hero is burst damage/healing
     getline(heroList, temp);
     temp.erase(temp.begin(), temp.begin() + temp.find_first_not_of(" \n\r\t"));
-    tmp_hero.setBurst("true" == temp || "True" == temp);
+    tmp_hero.burst =("true" == temp || "True" == temp);
     //getting if hero has sustain
     getline(heroList, temp);
     temp.erase(temp.begin(), temp.begin() + temp.find_first_not_of(" \n\r\t"));
-    tmp_hero.setSustain("true" == temp || "True" == temp);
+    tmp_hero.sustain =("true" == temp || "True" == temp);
     heroList.close();
     //end of getting data from text file
 
     cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
-    cout << tmp_hero.getName() + "\n";
-    cout << roles[tmp_hero.getRole()] + "\n";
-    cout << universes[tmp_hero.getUniverse()] + "\n";
-    cout << boolToString(tmp_hero.isMage()) + "\n";
-    cout << boolToString(tmp_hero.isBurst()) + "\n";
-    cout << boolToString(tmp_hero.isSustain()) + "\n";
+    cout << tmp_hero.heroName + "\n";
+    cout << roles[tmp_hero.heroRole] + "\n";
+    cout << universes[tmp_hero.heroUni] + "\n";
+    cout << boolToString(tmp_hero.mage) + "\n";
+    cout << boolToString(tmp_hero.burst) + "\n";
+    cout << boolToString(tmp_hero.sustain) + "\n";
 
     
     return 0;
