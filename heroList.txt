@@ -10,3 +10,21 @@ Alarak
     false
     true
     false
+Alexstrasza
+    hea
+    wc
+    false
+    false
+    true
+Ana
+    hea
+    ow
+    false
+    true
+    true
+Anduin
+    hea
+    wc
+    false
+    true
+    true
