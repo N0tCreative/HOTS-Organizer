@@ -4,3 +4,9 @@ Abathur
     false
     false
     false
+Alarak
+    mas
+    sc
+    false
+    true
+    false
