@@ -11,7 +11,7 @@ enum universe : unsigned char {Warcraft=0, StarCraft, Diablo, Overwatch, Nexus};
 //contains attributes of the heros
 struct hero {
     public:
-        string heroName;
+        string* heroName;
         role heroRole;
         universe heroUni;
         bool mage; //main source of dps comes from abilities
@@ -19,7 +19,7 @@ struct hero {
         bool sustain; //ability to remain in combat for long periods of time (combination of mana efficiency and self heal)
     //constructor for heros that are not initialized
     hero() {
-        heroName = "";
+        heroName = nullptr;
         heroRole = role::Tank;
         heroUni = universe::Warcraft;
         mage = false;
@@ -27,13 +27,17 @@ struct hero {
         sustain = false;
     }
 
-    hero(string newName, role newRole, universe newUniverse, bool newMage, bool newBurst, bool newSustain) {
+    hero(string* newName, role newRole, universe newUniverse, bool newMage, bool newBurst, bool newSustain) {
         heroName = newName;
         heroRole = newRole;
         heroUni = newUniverse;
         mage = newMage;
         burst = newBurst;
         sustain = newSustain;
+    }
+    ~hero() 
+    {
+        delete heroName;
     }
 };
 
@@ -63,10 +67,10 @@ int main() {
     string temp;
     string roles[] = {"Tank", "Bruiser", "Ranged Assassin", "Melee Assassin", "Healer", "Support"}; //used to convert enum back into string
     string universes[] = {"Warcraft", "StarCraft", "Diablo", "Overwatch", "Nexus"};//used to convert enum back into string
-    hero tmp_hero; //test hero
+    hero* tmp_hero; //test hero
     ifstream heroList;
-    unordered_map<string, hero> heroFinder;
-    hero returnHero;
+    unordered_map<string, hero*> heroFinder;
+    hero* returnHero;
 
     //open text file with values in it
     heroList.open("heroList.txt");
@@ -78,48 +82,66 @@ int main() {
     //start of getting data from text file
     //getting heros name
     while (getline(heroList, temp)) {
-        tmp_hero.heroName =temp;
+        tmp_hero = new hero;
+        tmp_hero->heroName = new string(temp);
         //getting heros role then trimming it and converting to enum
         getline(heroList, temp);
         temp.erase(temp.begin(), temp.begin() + temp.find_first_not_of(" \n\r\t"));
-        tmp_hero.heroRole = roleConverter.find(temp)->second;
+        tmp_hero->heroRole = roleConverter.find(temp)->second;
         //getting heros universe then trimming it and converting to enum
         getline(heroList, temp);
         temp.erase(temp.begin(), temp.begin() + temp.find_first_not_of(" \n\r\t"));
-        tmp_hero.heroUni = uniConverter.find(temp)->second;
+        tmp_hero->heroUni = uniConverter.find(temp)->second;
         //getting if hero is a mage
         getline(heroList, temp);
         temp.erase(temp.begin(), temp.begin() + temp.find_first_not_of(" \n\r\t"));
-        tmp_hero.mage =("true" == temp || "True" == temp);
+        tmp_hero->mage =("true" == temp || "True" == temp);
         //getting if hero is burst damage/healing
         getline(heroList, temp);
         temp.erase(temp.begin(), temp.begin() + temp.find_first_not_of(" \n\r\t"));
-        tmp_hero.burst =("true" == temp || "True" == temp);
+        tmp_hero->burst =("true" == temp || "True" == temp);
         //getting if hero has sustain
         getline(heroList, temp);
         temp.erase(temp.begin(), temp.begin() + temp.find_first_not_of(" \n\r\t"));
-        tmp_hero.sustain =("true" == temp || "True" == temp);
+        tmp_hero->sustain =("true" == temp || "True" == temp);
 
-        heroFinder.insert({tmp_hero.heroName, tmp_hero});
+        heroFinder.insert({*tmp_hero->heroName, tmp_hero});
     }
     heroList.close();
     //end of getting data from text file
 
-    returnHero = heroFinder.at("Alarak");
+    //allows user to check multiple heros
     cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
-    //cout << tmp_hero.heroName + "\n";
-    //cout << roles[tmp_hero.heroRole] + "\n";
-    //cout << universes[tmp_hero.heroUni] + "\n";
-    //cout << boolToString(tmp_hero.mage) + "\n";
-    //cout << boolToString(tmp_hero.burst) + "\n";
-    //cout << boolToString(tmp_hero.sustain) + "\n";
+    cout << "Enter the hero you would like to find or type exit to exit:\n";
+    while((cin >> temp) && temp != "exit"){
 
-    cout << returnHero.heroName + "\n";
-    cout << roles[returnHero.heroRole] + "\n";
-    cout << universes[returnHero.heroUni] + "\n";
-    cout << boolToString(returnHero.mage) + "\n";
-    cout << boolToString(returnHero.burst) + "\n";
-    cout << boolToString(returnHero.sustain) + "\n";
+        try {
+            returnHero = heroFinder.at(temp);
+        }
+        catch (const std::out_of_range& oor) {
+            cout << temp + " Not found, ensure the name is capitalized and spelled correctly\n";
+            continue;
+        }
+
+        cout << *returnHero->heroName + "\n";
+        cout << roles[returnHero->heroRole] + "\n";
+        cout << universes[returnHero->heroUni] + "\n";
+        temp = "Mage\n";
+        if(!returnHero->mage) {temp = "Not a " + temp;}
+        cout << temp;
+        temp = "Burst\n";
+        if(!returnHero->burst) {temp = "Doesnt have " + temp;}
+        cout << temp;
+        temp = "Sustain\n";
+        if(!returnHero->sustain){temp = "Doesnt have " + temp;}
+        cout << temp;
+        //cout << boolToString(returnHero->mage) + "\n";
+        //cout << boolToString(returnHero->burst) + "\n";
+        //cout << boolToString(returnHero->sustain) + "\n";
+        cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+        cout << "Enter the hero you would like to find or press enter to exit:\n";
+    }
     
+    heroFinder.clear();
     return 0;
 }
